@@ -1,6 +1,5 @@
 class LandingHero {
   constructor(options = {}) {
-    // 1. Core Default Settings
     this.options = {
       container: '#hero-container',
       logoText: 'Landinghero',
@@ -11,14 +10,11 @@ class LandingHero {
       ctaLink: '#',
       features: [
         'Built with pure modern JavaScript—no bulky frameworks required.',
-        'Automatically adapts to mobile, tablet, and desktop viewports out of the box.',
-        'Easy configuration for backgrounds (images, videos, gradients), CTA buttons, and alignment.'
+        'Automatically adapts to mobile, tablet, and desktop viewports out of the box.'
       ],
-      contactEmail: 'support@landinghero.com',
       ...options
     };
 
-    this.templates = {}; // Storage for user dynamic template injections
     this.init();
   }
 
@@ -47,7 +43,6 @@ class LandingHero {
     };
   }
 
-  // 2. Definitive Image-Accurate Syntax Engine
   Heroscript(scriptText) {
     const lines = scriptText.split('\n');
 
@@ -66,14 +61,12 @@ class LandingHero {
       line = line.trim();
       if (!line || line.startsWith('//')) return;
 
-      // Handle explicit Engine Initializer syntax -> landinghero.init("#hero" as lh)
       if (line.startsWith('landinghero.init')) {
         const matchInit = line.match(/init\s*\(\s*['"]?([^'"]+?)['"]?\s+as\s+\w+\s*\)/i);
         if (matchInit) this.init(matchInit[1]);
         return;
       }
 
-      // Handle raw HTML Appender rule -> lh.cont.add.html( <h1>hi</h1> )
       if (line.startsWith('lh.cont.add.html')) {
         const htmlContent = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).trim();
         if (this.elements.contactCard) {
@@ -82,7 +75,6 @@ class LandingHero {
         return;
       }
 
-      // Parse primary prefix selectors (e.g., lh.navbar, lh.hero.btn)
       const mainRegex = /^(?:lh\.)?([a-zA-Z0-9._-]+)\s*\((.*)\)\s*;?$/;
       const match = line.match(mainRegex);
       if (!match) return;
@@ -90,7 +82,6 @@ class LandingHero {
       const rawTarget = match[1];
       let innerContent = match[2].trim();
 
-      // Normalize element targeting maps based on your diagram specs
       let elementKey = rawTarget;
       if (rawTarget === 'navbar') elementKey = 'navbar';
       if (rawTarget === 'navbar.logotext') elementKey = 'logo';
@@ -100,30 +91,31 @@ class LandingHero {
       if (rawTarget === 'hero.higlt.span') elementKey = 'highlight';
       if (rawTarget === 'cont.div') elementKey = 'contactCard';
 
-      // Advanced nested parameter extractor loop (clears semicolons and commas)
+      // Advanced splitter handles both standard semicolons and clean commas safely
       const pairs = innerContent.split(/[;,](?![^(]*\))/);
 
       pairs.forEach(pair => {
-        if (!pair.includes('=')) return;
+        pair = pair.trim();
+        if (!pair || !pair.includes('=')) return;
+        
         let [key, val] = pair.split('=').map(s => s.trim());
-        val = val.replace(/^['"]|['"]$/g, ''); // Strip outer literal strings
+        // Clean trailing syntax fragments
+        if (val.endsWith(';')) val = val.slice(0, -1).trim();
+        val = val.replace(/^['"]|['"]$/g, ''); 
 
-        // Rule: Nested Element Image Replacer -> img.replace.text(url='...', alt='...')
         if (key.startsWith('img.replace.text')) {
-          const urlMatch = val.match(/url\s*=\s*['"]?([^'"]+?)['"]?(?:\s*|$)/);
+          const urlMatch = val.match(/url\s*=\s*['"]?([^'"]+?)['"]?/);
           const url = urlMatch ? urlMatch[1] : '';
           if (this.elements[elementKey]) {
             this.elements[elementKey].innerHTML = `<img src="${url}" style="height:32px; vertical-align:middle;"/>`;
           }
         }
-        // Rule: Background Graphic Replacer -> bg.img(url='...')
         else if (key.startsWith('bg.img')) {
-          const urlMatch = val.match(/url\s*=\s*['"]?([^'"]+?)['"]?(?:\s*|$)/);
+          const urlMatch = val.match(/url\s*=\s*['"]?([^'"]+?)['"]?/);
           if (urlMatch && this.elements.wrapper) {
             this.elements.wrapper.style.backgroundImage = `url('${urlMatch[1]}')`;
           }
         }
-        // Rule: Direct HTML Content Modification
         else if (key === 'text') {
           if (elementKey === 'highlight') {
             const spanEl = this.targetElement.querySelector('.lh-highlight');
@@ -132,25 +124,23 @@ class LandingHero {
             this.elements[elementKey].innerHTML = val;
           }
         }
-        // Rule: Click Binding Engine Actions
         else if (key === 'click') {
           if (this.elements[elementKey]) {
             this.elements[elementKey].addEventListener('click', (e) => {
               e.preventDefault();
-              alert(`Heroscript triggered Action: ${val}`);
+              alert(`Heroscript Action Triggered: ${val}`);
             });
           }
         }
-        // Rule: Modern Interface Typographical Rendering Engine Rules
         else if (key === 'anim' && val === 'typing') {
           if (this.elements[elementKey]) {
             this.elements[elementKey].style.borderRight = '2px solid white';
             this.elements[elementKey].style.whiteSpace = 'nowrap';
             this.elements[elementKey].style.overflow = 'hidden';
-            this.elements[elementKey].style.animation = 'lh-typing 3.5s steps(40, end), lh-blink .75s step-end infinite';
+            this.elements[elementKey].style.display = 'inline-block';
+            this.elements[elementKey].style.animation = 'lh-typing 3.5s steps(40, end)';
           }
         }
-        // Rule: Dynamic Native CSS styles mapping
         else if (styleMap[key]) {
           if (this.elements[elementKey]) {
             this.elements[elementKey].style[styleMap[key]] = val;
@@ -160,8 +150,7 @@ class LandingHero {
     });
   }
 
-  // Developer Access Utilities explicitly asked for in your schema print log comments
-  access.code(elementName) {
+  accessCode(elementName) {
     const el = this.elements[elementName] || this.targetElement.querySelector(`.lh-${elementName}`);
     return el ? el.outerHTML : 'Element not found';
   }
@@ -186,7 +175,6 @@ class LandingHero {
       .lh-contact-card { background: rgba(0, 0, 0, 0.7); padding: 30px; margin: 20px auto; max-width: 700px; text-align: center; border-radius: 12px; }
       .lh-footer { background-color: rgba(0, 0, 0, 0.8); text-align: center; padding: 20px; }
       @keyframes lh-typing { from { width: 0 } to { width: 100% } }
-      @keyframes lh-blink { from, to { border-color: transparent } 50% { border-color: white } }
     `;
     document.head.appendChild(styleEl);
   }
